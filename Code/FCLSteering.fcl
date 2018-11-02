@@ -1,0 +1,72 @@
+(* FCL File Created From FFLL Model For Fuzzy Logic Coursework *)
+FUNCTION_BLOCK
+
+VAR_INPUT
+	Speed_In	REAL; (* RANGE(-30 .. 30) *) 
+	Distance	REAL; (* RANGE(-300 .. 300) *) 
+END_VAR
+
+VAR_OUTPUT
+	Acceleration_Out	REAL; (* RANGE(-5 .. 5) *) 
+END_VAR
+
+FUZZIFY Speed_In
+	TERM Moving_Up_Fast := (0, 0) (-30, 1) (-15, 0) ;
+	TERM Moving_Up := (-30, 0) (-15, 1) (0, 0) ;
+	TERM Stationary := (-15, 0) (0, 1) (15, 0) ;
+	TERM Moving_Down := (0, 0) (15, 1) (30, 0) ;
+	TERM Moving_Down_Fast := (15, 0) (30, 1) (30, 0) ;
+END_FUZZIFY
+
+FUZZIFY Distance
+	TERM Up_Far := (-300, 0) (-300, 1) (-100, 0) ;
+	TERM Up := (-300, 0) (-100, 1) (0, 0) ;
+	TERM Central := (-100, 0) (0, 1) (100, 0) ;
+	TERM Down := (0, 0) (100, 1) (300, 0) ;
+	TERM Down_Far := (100, 0) (300, 1) (300, 0) ;
+END_FUZZIFY
+
+FUZZIFY Acceleration_Out
+	TERM Move_Up_Fast := (-5, 0) (-5, 1) (-2.5, 0) ;
+	TERM Move_Up := (-5, 0) (-2.5, 1) (0, 0) ;
+	TERM Stay := (-2.5, 0) (0, 1) (2.5, 0) ;
+	TERM Move_Down := (0, 0) (2.5, 1) (5, 0) ;
+	TERM Move_Down_Fast := (2.5, 0) (5, 1) (5, 0) ;
+END_FUZZIFY
+
+DEFUZZIFY valve
+	METHOD: CoG;
+END_DEFUZZIFY
+
+RULEBLOCK first
+	AND:MIN;
+	ACCUM:MAX;
+	RULE 0: IF Moving_Up_Fast AND Up_Far THEN Stay;
+	RULE 1: IF Moving_Up_Fast AND Up THEN Stay;
+	RULE 2: IF Moving_Up_Fast AND Central THEN Move_Down_Fast;
+	RULE 3: IF Moving_Up_Fast AND Down THEN Move_Down_Fast;
+	RULE 4: IF Moving_Up_Fast AND Down_Far THEN Move_Down_Fast;
+	RULE 5: IF Moving_Up AND Up_Far THEN Move_Up_Fast;
+	RULE 6: IF Moving_Up AND Up THEN Stay;
+	RULE 7: IF Moving_Up AND Central THEN Move_Down;
+	RULE 8: IF Moving_Up AND Down THEN Move_Down_Fast;
+	RULE 9: IF Moving_Up AND Down_Far THEN Move_Down_Fast;
+	RULE 10: IF Stationary AND Up_Far THEN Move_Up_Fast;
+	RULE 11: IF Stationary AND Up THEN Move_Up;
+	RULE 12: IF Stationary AND Central THEN Stay;
+	RULE 13: IF Stationary AND Down THEN Move_Down;
+	RULE 14: IF Stationary AND Down_Far THEN Move_Down_Fast;
+	RULE 15: IF Moving_Down AND Up_Far THEN Move_Up_Fast;
+	RULE 16: IF Moving_Down AND Up THEN Move_Up_Fast;
+	RULE 17: IF Moving_Down AND Central THEN Move_Up;
+	RULE 18: IF Moving_Down AND Down THEN Stay;
+	RULE 19: IF Moving_Down AND Down_Far THEN Move_Down_Fast;
+	RULE 20: IF Moving_Down_Fast AND Up_Far THEN Move_Up_Fast;
+	RULE 21: IF Moving_Down_Fast AND Up THEN Move_Up_Fast;
+	RULE 22: IF Moving_Down_Fast AND Central THEN Move_Up_Fast;
+	RULE 23: IF Moving_Down_Fast AND Down THEN Stay;
+	RULE 24: IF Moving_Down_Fast AND Down_Far THEN Stay;
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
+
